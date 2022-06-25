@@ -14,10 +14,18 @@ class NewsListAPI(APIView):
     def post(self, request):
         model_sr = NewsSerializer(data=request.data)
         model_sr.is_valid(raise_exception=True)
-        new_news = News.objects.create(
-            title=request.data['title'],
-            content=request.data['content'],
-            is_published=request.data['is_published'],
-            category_id=request.data['category_id']
-        )
-        return Response({'created data': NewsSerializer(new_news).data})
+        model_sr.save()
+        return Response({'created data': NewsSerializer(model_sr).data})
+
+    def put(self, request, *args, **kwargs):
+        pk = kwargs.get('pk', None)
+        if not pk:
+            return Response({'error': "invalid pk"})
+        try:
+            instance = News.objects.get(pk=pk)
+        except:
+            return Response({'error': "invalid pk"})
+        serializer = NewsSerializer(data=request.data, instance=instance)
+        serializer.is_valid()
+        serializer.save()
+        return Response({"news": serializer.data})

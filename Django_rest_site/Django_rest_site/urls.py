@@ -19,5 +19,6 @@ from news.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1/newslist', NewsListAPI.as_view()),
+    path('api/v1/newslist/', NewsListAPI.as_view()),
+    path('api/v1/newslist/<int:pk>/', NewsListAPI.as_view()),
 ]
