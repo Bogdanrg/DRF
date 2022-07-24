@@ -1,35 +1,53 @@
 from django.forms import model_to_dict
+from django.http import HttpResponse
 from rest_framework import generics, viewsets
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, IsAdminUser
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from .serializers import NewsSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import *
+from .permissions import *
+
+# class NewsViewSet(viewsets.ModelViewSet):
+#    serializer_class = NewsSerializer
+#
+#    def get_queryset(self):
+#        if self.kwargs.get('pk', None):
+#            return News.objects.filter(pk=self.kwargs.get('pk'))
+#        return News.objects.all()[:3]
+#
+#    @action(methods=['get'], detail=False, url_path='category',
+#            url_name='category')
+#    def category(self, request):
+#        cats = Category.objects.all()
+#        return Response({'cats': [c.title for c in cats]})
 
 
-class NewsViewSet(viewsets.ModelViewSet):
+class NewUpdateApiView(generics.RetrieveUpdateAPIView):
+    lookup_url_kwarg = 'new_pk'
     queryset = News.objects.all()
     serializer_class = NewsSerializer
-
-    @action(methods=['get'], detail=False)
-    def category(self, request, pk=None):
-        cats = Category.objects.all()
-        return Response({'cats': [c.title for c in cats]})
-    # class NewsListAPIView(generics.ListAPIView):
-# queryset = News.objects.all()
-# serializer_class = NewsSerializer
+    permission_classes = (IsOwnerOrReadOnly, )
+    # authentication_classes = (SessionAuthentication, )
 
 
-# class NewsUpdateApiView(generics.UpdateAPIView):
-# queryset = News.objects.all()
-# serializer_class = NewsSerializer
+class NewsAPIList(generics.ListCreateAPIView):
+    queryset = News.objects.all()
+    serializer_class = NewsSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, )
 
 
-# class NewApiView(generics.RetrieveUpdateDestroyAPIView):
-# lookup_url_kwarg = 'new_pk'
-# queryset = News.objects.all()
-# serializer_class = NewsSerializer
+class NewDeleteAPIView(generics.RetrieveDestroyAPIView):
+    lookup_url_kwarg = 'new_pk'
+    queryset = News.objects.all()
+    serializer_class = NewsSerializer
+    permission_classes = (IsAuthenticated, )
+    authentication_classes = (JWTAuthentication, )
+
 
 # class NewsListAPI(APIView):
 #   def get(self, request):
