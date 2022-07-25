@@ -5,7 +5,7 @@ from rest_framework.authentication import TokenAuthentication, SessionAuthentica
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, IsAdminUser
 from rest_framework_simplejwt.authentication import JWTAuthentication
-
+from .paginations import *
 from .serializers import NewsSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -39,6 +39,7 @@ class NewsAPIList(generics.ListCreateAPIView):
     queryset = News.objects.all()
     serializer_class = NewsSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, )
+    pagination_class = NewsCustomSetPagination
 
 
 class NewDeleteAPIView(generics.RetrieveDestroyAPIView):
